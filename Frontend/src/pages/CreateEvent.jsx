@@ -53,75 +53,83 @@ function CreateEvent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 p-6 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-orange-500 via-white to-yellow-500 p-6 flex items-center justify-center">
       <form
-        className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-lg space-y-5 dark:bg-gray-900 dark:text-gray-100"
+        className="bg-white rounded-2xl shadow-2xl shadow-orange-500 p-8 w-full max-w-lg space-y-5 dark:bg-gray-900 dark:text-gray-100"
         onSubmit={handleSubmit}
         encType="multipart/form-data"
       >
-        <h2 className="text-2xl font-bold text-blue-700 mb-4 text-center dark:text-blue-200">
+        <h2 className="text-2xl font-bold text-orange-700 mb-4 text-center dark:text-orange-200">
           Create New Event
         </h2>
+
         <input
           type="text"
           name="title"
           placeholder="Event Title"
-          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
+          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400"
           value={form.title}
           onChange={handleChange}
           required
         />
+
         <textarea
           name="description"
           placeholder="Event Description"
-          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
+          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400"
           value={form.description}
           onChange={handleChange}
           required
         />
+
         <input
           type="date"
           name="date"
-          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
+          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400"
           value={form.date}
           onChange={handleChange}
           required
         />
+
         <input
           type="text"
           name="venue"
           placeholder="Venue"
-          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
+          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400"
           value={form.venue}
           onChange={handleChange}
           required
         />
+
         <input
           type="text"
           name="club"
           placeholder="Club Name"
-          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
+          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400"
           value={form.club}
           onChange={handleChange}
           required
         />
+
         <input
           type="text"
           name="category"
           placeholder="Category"
-          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
+          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400"
           value={form.category}
           onChange={handleChange}
           required
         />
+
         <input
           type="url"
           name="registrationLink"
-          placeholder="Registration Link (optional)"
-          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
+          placeholder="Registration Link "
+          className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-400"
           value={form.registrationLink}
           onChange={handleChange}
         />
+
         <input
           type="file"
           name="image"
@@ -129,15 +137,17 @@ function CreateEvent() {
           className="w-full px-4 py-2 border rounded-lg"
           onChange={handleChange}
         />
+
         {error && (
           <div className="text-red-500 text-center text-sm">{error}</div>
         )}
         {success && (
           <div className="text-green-600 text-center text-sm">{success}</div>
         )}
+
         <button
           type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition shadow"
+          className="w-full bg-orange-600 text-white py-2 rounded-lg font-semibold hover:bg-orange-700 transition shadow"
           disabled={loading}
         >
           {loading ? "Creating..." : "Create Event"}

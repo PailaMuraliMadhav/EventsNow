@@ -55,7 +55,7 @@ function Login() {
               </text>
             </svg>
             <span className="text-white text-2xl font-bold mt-4 tracking-wide">
-              EventsNow
+              Kreapt
             </span>
             <span className="text-orange-100 text-sm mt-2 text-center">
               Welcome back! Sign in to manage and join events.
@@ -66,7 +66,7 @@ function Login() {
         {/* Right: Form */}
         <div className="flex-1 p-10 flex flex-col justify-center">
           <h2 className="text-3xl font-extrabold mb-6 text-orange-400 text-center tracking-tight">
-            Login to EventsNow
+            Login to Kreapt
           </h2>
           {error && (
             <div className="bg-red-600 text-white px-4 py-2 rounded mb-4 text-sm text-center">

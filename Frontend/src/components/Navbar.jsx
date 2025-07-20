@@ -109,7 +109,7 @@ function Navbar() {
                 localStorage.removeItem("user");
                 window.location.href = "/";
               }}
-              className="px-4 py-1 rounded bg-gray-700 hover:bg-gray-600 text-white transition"
+              className="px-4 py-1 rounded bg-gray-800 hover:bg-gray-600 text-white transition"
             >
               Logout
             </button>

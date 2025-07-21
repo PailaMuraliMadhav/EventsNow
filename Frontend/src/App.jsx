@@ -1,11 +1,6 @@
 import React, { useState } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Link,
-  useNavigate,
-} from "react-router-dom";
+import { Analytics } from "@vercel/analytics/next";
+import {BrowserRouter as Router,Routes,Route,Link,useNavigate,} from "react-router-dom";
 import api from "./api/axios";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";

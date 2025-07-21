@@ -5,7 +5,7 @@ import {
   getEvents,
   getEventById,
   updateEvent,
-  deleteEvent,
+  deleteEvent,addCommentToEvent
 } from "../controllers/event.controller.js";
 import { authMiddleware } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
@@ -17,5 +17,7 @@ router.get("/", getEvents);
 router.get("/:id", getEventById);
 router.put("/:id", authMiddleware, updateEvent);
 router.delete("/:id", authMiddleware, deleteEvent);
+router.post("/:id/comment", addCommentToEvent);
+
 
 export default router;

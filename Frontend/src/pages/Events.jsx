@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../api/axios";
+import CommentSection from "../components/CommentSection";
 
 function EventCard({ event, onClick }) {
   return (
@@ -130,7 +131,7 @@ function Events() {
         )}
         {selected && (
           <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-2xl shadow-2xl max-w-lg w-full p-8 relative animate-fadeIn border border-orange-600">
+            <div className="bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] p-6 relative animate-fadeIn border border-orange-600 overflow-y-auto">
               <button
                 className="absolute top-3 right-3 text-gray-400 hover:text-orange-400 text-2xl"
                 onClick={() => setSelected(null)}
@@ -156,10 +157,8 @@ function Events() {
                   {selected.club}
                 </span>
               </div>
-              <p className="text-gray-200 mb-4">
-                {selected.description}
-              </p>
-              <div className="flex flex-col gap-2">
+              <p className="text-gray-200 mb-4">{selected.description}</p>
+              <div className="flex flex-col gap-2 mb-4">
                 <a
                   href={selected.registrationLink}
                   target="_blank"
@@ -184,6 +183,9 @@ function Events() {
                 >
                   Add to Google Calendar
                 </a>
+              </div>
+              <div className="max-h-64 overflow-y-auto border-t border-gray-700 pt-4">
+                <CommentSection eventId={selected._id} />
               </div>
             </div>
           </div>

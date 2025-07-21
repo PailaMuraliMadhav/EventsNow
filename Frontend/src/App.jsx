@@ -25,11 +25,10 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/create-event" element={<CreateEvent />} />
       </Routes>
-
-     
-      <Analytics />
+      <Analytics /> 
     </Router>
   );
 }
+
 
 export default App;

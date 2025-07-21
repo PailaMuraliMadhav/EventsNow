@@ -24,8 +24,8 @@ mongoose
   .catch((err) => console.error("MongoDB connection error:", err));
 
 // Routes
-app.use("/api/users", userRoutes);
-app.use("/api/events", eventRoutes);
+app.use("/users", userRoutes);
+app.use("/events", eventRoutes);
 
 app.get("/", (req, res) => {
   res.send("Kreapt API Running");

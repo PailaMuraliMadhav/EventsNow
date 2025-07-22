@@ -119,7 +119,10 @@ Backend will run at: `http://localhost:5000`
 
 ## 📸 Screenshots
 
-*(Add screenshots or screen recordings here to visually showcase the app)*
+<img width="1917" height="978" alt="image" src="https://github.com/user-attachments/assets/e0aa259f-4d8e-45d2-b867-881cb3dabae0" />
+<img width="1914" height="923" alt="image" src="https://github.com/user-attachments/assets/bf2e94ea-d1a0-4902-b5b0-76310710e766" />
+
+
 
 ---
 

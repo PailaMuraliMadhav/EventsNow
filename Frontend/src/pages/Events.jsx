@@ -1,35 +1,38 @@
 import React, { useEffect, useState } from "react";
 import api from "../api/axios";
-import CommentSection from "../components/CommentSection";
 
+// Event Card (clean, light, navy-gold theme)
 function EventCard({ event, onClick }) {
   return (
     <div
-      className="bg-gradient-to-br from-gray-900 to-gray-950 rounded-2xl shadow-xl ring-2 ring-orange-700 hover:shadow-2xl transition cursor-pointer flex flex-col text-white overflow-hidden"
+      className="relative rounded-xl shadow-md border border-[#d6d8de] hover:shadow-lg transition cursor-pointer overflow-hidden bg-white"
       onClick={onClick}
+      tabIndex={0}
+      aria-label={event.title}
     >
       <img
         src={event.image || "https://source.unsplash.com/400x200/?event,party"}
         alt={event.title}
-        className="h-60 w-full object-cover object-center"
+        className="h-44 w-full object-cover"
+        loading="lazy"
       />
-      <div className="p-5 flex-1 flex flex-col justify-between">
+      <div className="p-4 flex flex-col justify-between h-full">
         <div>
-          <h3 className="text-2xl font-bold text-orange-400 mb-1">
+          <h3 className="text-lg font-bold text-[#1a2340] mb-1 truncate">
             {event.title}
           </h3>
-          <p className="text-gray-300 text-sm mb-2">
+          <p className="text-gray-600 text-sm mb-1 truncate">
             {event.club} • {new Date(event.date).toLocaleDateString()}
           </p>
-          <p className="text-gray-200 text-sm line-clamp-2">
+          <p className="text-gray-700 text-sm line-clamp-2">
             {event.description}
           </p>
         </div>
-        <div className="mt-4 flex gap-2">
-          <span className="bg-orange-700 text-orange-100 px-3 py-1 rounded-xl text-xs font-semibold">
+        <div className="mt-3 flex gap-2 flex-wrap">
+          <span className="bg-[#c7a008]/20 text-[#1a2340] px-3 py-1 rounded-full text-xs font-semibold">
             {event.category}
           </span>
-          <span className="bg-gray-700 text-gray-100 px-3 py-1 rounded-xl text-xs font-semibold">
+          <span className="bg-[#1a2340]/10 text-[#1a2340] px-3 py-1 rounded-full text-xs font-semibold">
             {event.venue}
           </span>
         </div>
@@ -38,12 +41,25 @@ function EventCard({ event, onClick }) {
   );
 }
 
+// Small-screen hook
+function useIsSmallScreen() {
+  const [isSmall, setIsSmall] = useState(false);
+  useEffect(() => {
+    const check = () => setIsSmall(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+  return isSmall;
+}
+
 function Events() {
   const [events, setEvents] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState({ club: "", category: "", date: "" });
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
+  const isSmallScreen = useIsSmallScreen();
 
   useEffect(() => {
     api.get("/events").then((res) => {
@@ -56,7 +72,8 @@ function Events() {
     return (
       (!filter.club || e.club === filter.club) &&
       (!filter.category || e.category === filter.category) &&
-      (!filter.date || new Date(e.date).toLocaleDateString() === filter.date) &&
+      (!filter.date ||
+        new Date(e.date).toLocaleDateString() === filter.date) &&
       (e.title.toLowerCase().includes(search.toLowerCase()) ||
         e.description.toLowerCase().includes(search.toLowerCase()))
     );
@@ -66,21 +83,24 @@ function Events() {
   const categories = [...new Set(events.map((e) => e.category).filter(Boolean))];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-950 to-black p-6">
-      <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl font-extrabold mb-6 text-orange-400 text-center">
-          Upcoming Events
+    <div className="min-h-screen bg-[#f2f3f5] p-4 sm:p-8 text-[#1a2340]">
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-3xl sm:text-4xl font-extrabold mb-8 text-center text-[#1a2340]">
+          <span className="text-[#c7a008]">Upcoming</span> Events
         </h2>
-        <div className="flex flex-wrap gap-4 mb-8 justify-center">
+
+        {/* Filters */}
+        <div className="flex flex-wrap gap-3 mb-8 justify-center">
           <input
             type="text"
             placeholder="Search events..."
-            className="px-4 py-2 border border-orange-700 bg-gray-800 text-white rounded-lg focus:ring-2 focus:ring-orange-500"
+            className="px-3 py-2 border border-[#c7a008] bg-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#c7a008]/50 w-48 sm:w-60"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
+
           <select
-            className="px-4 py-2 border border-orange-700 bg-gray-800 text-white rounded-lg"
+            className="px-3 py-2 border border-[#d6d8de] bg-white rounded-lg text-sm"
             value={filter.club}
             onChange={(e) => setFilter((f) => ({ ...f, club: e.target.value }))}
           >
@@ -91,10 +111,13 @@ function Events() {
               </option>
             ))}
           </select>
+
           <select
-            className="px-4 py-2 border border-orange-700 bg-gray-800 text-white rounded-lg"
+            className="px-3 py-2 border border-[#d6d8de] bg-white rounded-lg text-sm"
             value={filter.category}
-            onChange={(e) => setFilter((f) => ({ ...f, category: e.target.value }))}
+            onChange={(e) =>
+              setFilter((f) => ({ ...f, category: e.target.value }))
+            }
           >
             <option value="">All Categories</option>
             {categories.map((cat) => (
@@ -103,23 +126,26 @@ function Events() {
               </option>
             ))}
           </select>
+
           <input
             type="date"
-            className="px-4 py-2 border border-orange-700 bg-gray-800 text-white rounded-lg"
+            className="px-3 py-2 border border-[#d6d8de] bg-white rounded-lg text-sm"
             value={filter.date}
             onChange={(e) => setFilter((f) => ({ ...f, date: e.target.value }))}
           />
         </div>
+
+        {/* Event Cards */}
         {loading ? (
-          <div className="text-center text-lg text-gray-400">
+          <div className="text-center text-gray-500 text-lg">
             Loading events...
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center text-lg text-gray-400">
+          <div className="text-center text-gray-500 text-lg">
             No events found.
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filtered.map((event) => (
               <EventCard
                 key={event._id}
@@ -129,41 +155,57 @@ function Events() {
             ))}
           </div>
         )}
+
+        {/* Modal */}
         {selected && (
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
-            <div className="bg-gradient-to-br from-gray-900 to-gray-800 text-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] p-6 relative animate-fadeIn border border-orange-600 overflow-y-auto">
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-3">
+            <div
+              className={`bg-white text-[#1a2340] rounded-2xl shadow-2xl w-full ${
+                isSmallScreen
+                  ? "max-w-[95vw] max-h-[90vh] p-4"
+                  : "max-w-lg max-h-[90vh] p-6"
+              } relative border border-[#c7a008]/30 overflow-y-auto`}
+            >
               <button
-                className="absolute top-3 right-3 text-gray-400 hover:text-orange-400 text-2xl"
+                className="absolute top-2 right-3 text-gray-500 hover:text-[#c7a008] text-2xl"
                 onClick={() => setSelected(null)}
+                aria-label="Close"
               >
                 &times;
               </button>
+
               <img
-                src={selected.image || "https://source.unsplash.com/400x200/?event,party"}
+                src={
+                  selected.image ||
+                  "https://source.unsplash.com/400x200/?event,party"
+                }
                 alt={selected.title}
-                className="h-60 w-full object-cover object-center rounded mb-4"
+                className="h-48 sm:h-56 w-full object-cover rounded mb-4"
               />
-              <h3 className="text-2xl font-bold text-orange-400 mb-2">
-                {selected.title}
-              </h3>
-              <div className="flex gap-2 mb-2">
-                <span className="bg-orange-700 text-orange-100 px-2 py-1 rounded text-xs font-semibold">
+
+              <h3 className="text-2xl font-bold mb-2">{selected.title}</h3>
+              <div className="flex gap-2 mb-3 flex-wrap">
+                <span className="bg-[#c7a008]/20 text-[#1a2340] px-2 py-1 rounded text-xs font-semibold">
                   {selected.category}
                 </span>
-                <span className="bg-gray-700 text-gray-100 px-2 py-1 rounded text-xs font-semibold">
+                <span className="bg-[#1a2340]/10 text-[#1a2340] px-2 py-1 rounded text-xs font-semibold">
                   {selected.venue}
                 </span>
-                <span className="bg-gray-800 text-gray-100 px-2 py-1 rounded text-xs font-semibold">
+                <span className="bg-gray-100 text-[#1a2340] px-2 py-1 rounded text-xs font-semibold">
                   {selected.club}
                 </span>
               </div>
-              <p className="text-gray-200 mb-4">{selected.description}</p>
-              <div className="flex flex-col gap-2 mb-4">
+
+              <p className="text-gray-700 text-sm mb-4">
+                {selected.description}
+              </p>
+
+              <div className="flex flex-col gap-2">
                 <a
                   href={selected.registrationLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full text-center bg-orange-600 text-white py-2 rounded-lg font-semibold hover:bg-orange-700 transition"
+                  className="w-full text-center bg-[#1a2340] text-white py-2 rounded-lg font-semibold hover:bg-[#2b3560] transition text-sm"
                 >
                   Register
                 </a>
@@ -179,13 +221,10 @@ function Events() {
                   )}&location=${encodeURIComponent(selected.venue)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full text-center bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition"
+                  className="w-full text-center bg-[#c7a008] text-white py-2 rounded-lg font-semibold hover:bg-[#d4b11d] transition text-sm"
                 >
                   Add to Google Calendar
                 </a>
-              </div>
-              <div className="max-h-64 overflow-y-auto border-t border-gray-700 pt-4">
-                <CommentSection eventId={selected._id} />
               </div>
             </div>
           </div>

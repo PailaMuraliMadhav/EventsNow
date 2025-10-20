@@ -20,84 +20,71 @@ function Login() {
       localStorage.setItem("user", JSON.stringify(res.data.user));
       navigate("/dashboard");
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Login failed. Please try again."
-      );
+      setError(err.response?.data?.message || "Login failed. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[#0a0a0a]">
-      <div className="bg-[#1a1a1a] shadow-2xl rounded-3xl p-0 w-full max-w-2xl flex flex-col md:flex-row overflow-hidden text-white">
-        {/* Left: Brand */}
-        <div className="hidden md:flex flex-col items-center justify-center bg-gradient-to-br from-orange-500 to-yellow-400 p-10 w-1/2">
-          <div className="flex flex-col items-center">
-            <svg
-              width="60"
-              height="60"
-              viewBox="0 0 60 60"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <circle cx="30" cy="30" r="30" fill="#EA580C" />
-              <text
-                x="50%"
-                y="55%"
-                textAnchor="middle"
-                fill="#fff"
-                fontSize="2rem"
-                fontWeight="bold"
-                dy=".3em"
-              >
-                EV
-              </text>
-            </svg>
-            <span className="text-white text-2xl font-bold mt-4 tracking-wide">
-              Kreapt
-            </span>
-            <span className="text-orange-100 text-sm mt-2 text-center">
-              Welcome back! Sign in to manage and join events.
-            </span>
+    <div className="min-h-screen flex items-center justify-center bg-[#f2f3f5] text-[#1a2340] px-4">
+      <div className="bg-[#ffffff] border border-[#d6d8de] rounded-2xl shadow-lg w-full max-w-4xl flex flex-col md:flex-row overflow-hidden">
+        
+        {/* Left Side: Brand */}
+        <div className="hidden md:flex flex-col items-center justify-center bg-[#e9ebef] w-1/2 p-10 border-r border-[#d6d8de]">
+          <div className="w-20 h-20 flex items-center justify-center rounded-xl bg-white border-2 border-[#1a2340] shadow-sm">
+            <img
+              src="/vite.png" // replace with your logo path
+              alt="EventsNow Logo"
+              className="w-10 h-10"
+            />
           </div>
+          <h1 className="mt-4 text-3xl font-bold">
+            <span className="text-[#1a2340]">Events</span>
+            <span className="text-[#c7a008]">Now</span>
+          </h1>
+          <p className="text-gray-600 mt-2 text-center text-sm">
+            Login to explore and manage your campus events.
+          </p>
         </div>
 
-        {/* Right: Form */}
-        <div className="flex-1 p-10 flex flex-col justify-center">
-          <h2 className="text-3xl font-extrabold mb-6 text-orange-400 text-center tracking-tight">
-            Login to Kreapt
+        {/* Right Side: Login Form */}
+        <div className="flex-1 p-8 md:p-10 flex flex-col justify-center">
+          <h2 className="text-3xl font-bold mb-6 text-center text-[#1a2340]">
+            Welcome Back 👋
           </h2>
+
           {error && (
-            <div className="bg-red-600 text-white px-4 py-2 rounded mb-4 text-sm text-center">
+            <div className="bg-red-100 text-red-700 border border-red-200 px-4 py-2 rounded-lg mb-4 text-sm text-center">
               {error}
             </div>
           )}
+
           <form className="space-y-5" onSubmit={handleSubmit}>
             <input
               type="email"
               placeholder="Email"
-              className="w-full px-4 py-3 border border-gray-700 bg-[#0f0f0f] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full px-4 py-3 border border-[#d6d8de] bg-[#f8f9fb] text-[#1a2340] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c7a008]"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               autoFocus
             />
+
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
-                className="w-full px-4 py-3 border border-gray-700 bg-[#0f0f0f] text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 pr-10"
+                className="w-full px-4 py-3 border border-[#d6d8de] bg-[#f8f9fb] text-[#1a2340] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c7a008] pr-10"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
               <button
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-500 text-lg"
-                tabIndex={-1}
                 onClick={() => setShowPassword((v) => !v)}
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#1a2340]/70 hover:text-[#c7a008] transition"
+                tabIndex={-1}
               >
                 {showPassword ? (
                   <svg
@@ -132,19 +119,21 @@ function Login() {
                 )}
               </button>
             </div>
+
             <button
               type="submit"
-              className="w-full bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600 transition duration-300 shadow-lg"
+              className="w-full bg-[#1a2340] text-white py-3 rounded-full font-semibold hover:bg-[#2b3560] transition duration-300"
               disabled={loading}
             >
               {loading ? "Signing In..." : "Sign In"}
             </button>
           </form>
-          <div className="text-center mt-4 text-sm">
-            Don't have an account? {" "}
+
+          <div className="text-center mt-6 text-sm text-gray-700">
+            Don’t have an account?{" "}
             <Link
               to="/signup"
-              className="text-orange-400 hover:underline"
+              className="text-[#c7a008] font-semibold hover:underline"
             >
               Sign Up
             </Link>

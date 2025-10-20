@@ -26,221 +26,181 @@ function Dashboard() {
 
   if (!user)
     return (
-      <div className="p-8 text-center text-lg">
-        Please login to view your dashboard.
+      <div className="p-8 text-center text-lg text-gray-400">
+        Please <Link to="/login" className="text-orange-400 hover:underline">log in</Link> to view your dashboard.
       </div>
     );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-100 via-white to-orange-200 p-6 dark:bg-gradient-to-br dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="max-w-5xl mx-auto">
-        <h2 className="text-3xl font-extrabold mb-6 text-orange-700 text-center">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+      <div className="max-w-6xl mx-auto">
+        <h2 className="text-4xl font-extrabold mb-8 text-center bg-gradient-to-r from-orange-400 to-pink-400 bg-clip-text text-transparent">
           Dashboard
         </h2>
+
         {user.role === "organizer" ? (
-          <React.Fragment>
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-bold text-orange-800">Your Events</h3>
-              <Link
-                to="/create-event"
-                className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition"
-              >
-                + Create Event
-              </Link>
-            </div>
-            {loading ? (
-              <div className="text-center text-lg text-gray-500">
-                Loading...
-              </div>
-            ) : myEvents.length === 0 ? (
-              <div className="text-center text-lg text-gray-500">
-                No events created yet.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {myEvents.map((event) => (
-                  <div
-                    key={event._id}
-                    className="bg-white rounded-2xl shadow-2xl border p-4 flex flex-col dark:bg-gray-800 dark:text-gray-100"
-                  >
-                    <h4 className="text-lg font-bold text-orange-700 mb-1">
-                      {event.title}
-                    </h4>
-                    <p className="text-gray-600 text-sm mb-2">
-                      {new Date(event.date).toLocaleDateString()} • {event.venue}
-                    </p>
-                    <div className="flex gap-2 mt-auto">
-                      <button
-                        className="px-3 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 text-xs"
-                        onClick={() => {
-                          navigate("/create-event", { state: { event } });
-                        }}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs"
-                        onClick={async () => {
-                          if (
-                            window.confirm("Are you sure you want to delete this event?")
-                          ) {
-                            try {
-                              const token = localStorage.getItem("token");
-                              await api.delete(`/events/${event._id}`, {
-                                headers: { Authorization: `Bearer ${token}` },
-                              });
-                              setMyEvents((prev) =>
-                                prev.filter((e) => e._id !== event._id)
-                              );
-                            } catch (err) {
-                              alert("Failed to delete event");
-                            }
-                          }
-                        }}
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </React.Fragment>
+          <OrganizerView
+            myEvents={myEvents}
+            loading={loading}
+            setMyEvents={setMyEvents}
+            navigate={navigate}
+          />
         ) : (
-          <React.Fragment>
-            <h3 className="text-xl font-bold text-orange-800 mb-4">
-              Registered Events
-            </h3>
-            {loading ? (
-              <div className="text-center text-lg text-gray-500">
-                Loading...
-              </div>
-            ) : registered.length === 0 ? (
-              <div className="text-center text-lg text-gray-500">
-                No events registered yet.
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {registered.map((event) => (
-                  <EventRegistrationCard
-                    key={event._id}
-                    event={event}
-                    setRegistered={setRegistered}
-                  />
-                ))}
-              </div>
-            )}
-          </React.Fragment>
+          <AttendeeView
+            registered={registered}
+            loading={loading}
+            setRegistered={setRegistered}
+          />
         )}
       </div>
     </div>
   );
 }
 
-function EventRegistrationCard({ event, setRegistered }) {
-  const [comment, setComment] = useState("");
-  const [rating, setRating] = useState(0);
-  const [submitting, setSubmitting] = useState(false);
-  const [comments, setComments] = useState(event.comments || []);
+// Organizer Dashboard View
+function OrganizerView({ myEvents, loading, setMyEvents, navigate }) {
+  return (
+    <div>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-8 gap-4">
+        <h3 className="text-2xl font-bold text-white">Your Events</h3>
+        <Link
+          to="/create-event"
+          className="px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all text-center"
+        >
+          + Create Event
+        </Link>
+      </div>
 
-  const handleCommentSubmit = async () => {
-    if (!comment || rating < 1 || rating > 5) {
-      alert("Please enter a comment and select a rating (1-5)");
-      return;
-    }
-    setSubmitting(true);
+      {loading ? (
+        <div className="text-center text-gray-400 text-lg">Loading your events...</div>
+      ) : myEvents.length === 0 ? (
+        <div className="text-center text-gray-400 text-lg">
+          <p>You haven't created any events yet.</p>
+          <Link to="/create-event" className="text-orange-400 hover:underline mt-2 inline-block">
+            Create your first event
+          </Link>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {myEvents.map((event) => (
+            <EventCard
+              key={event._id}
+              event={event}
+              isOrganizer={true}
+              setMyEvents={setMyEvents}
+              navigate={navigate}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Attendee Dashboard View
+function AttendeeView({ registered, loading, setRegistered }) {
+  return (
+    <div>
+      <h3 className="text-2xl font-bold text-white mb-8">Your Registered Events</h3>
+
+      {loading ? (
+        <div className="text-center text-gray-400 text-lg">Loading registered events...</div>
+      ) : registered.length === 0 ? (
+        <div className="text-center text-gray-400 text-lg">
+          <p>You haven't registered for any events yet.</p>
+          <Link to="/events" className="text-orange-400 hover:underline mt-2 inline-block">
+            Browse upcoming events
+          </Link>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {registered.map((event) => (
+            <EventCard
+              key={event._id}
+              event={event}
+              isOrganizer={false}
+              setRegistered={setRegistered}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Unified Event Card for both views
+function EventCard({ event, isOrganizer, setMyEvents, setRegistered, navigate }) {
+  const handleDelete = async () => {
+    if (!window.confirm("Are you sure you want to delete this event? This action cannot be undone.")) return;
     try {
       const token = localStorage.getItem("token");
-      const res = await api.post(
-        `/events/${event._id}/comments`,
-        { comment, rating },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setComments(res.data.comments);
-      setComment("");
-      setRating(0);
+      await api.delete(`/events/${event._id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setMyEvents((prev) => prev.filter((e) => e._id !== event._id));
     } catch (err) {
-      alert("Failed to submit comment");
-    } finally {
-      setSubmitting(false);
+      alert("Failed to delete event. Please try again.");
+    }
+  };
+
+  const handleUnregister = async () => {
+    if (!window.confirm("Are you sure you want to unregister from this event?")) return;
+    try {
+      const token = localStorage.getItem("token");
+      await api.delete(`/events/${event._id}/unregister`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setRegistered((prev) => prev.filter((e) => e._id !== event._id));
+    } catch (err) {
+      alert("Failed to unregister. Please try again.");
     }
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-2xl border p-4 flex flex-col mb-4 dark:bg-gray-800 dark:text-gray-100">
-      <h4 className="text-lg font-bold text-orange-700 mb-1">{event.title}</h4>
-      <p className="text-gray-600 text-sm mb-2">
-        {new Date(event.date).toLocaleDateString()} • {event.venue}
-      </p>
-      <div className="flex gap-2 mt-auto mb-2">
-        <button
-          className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs"
-          onClick={async () => {
-            if (
-              window.confirm("Are you sure you want to unregister from this event?")
-            ) {
-              try {
-                const token = localStorage.getItem("token");
-                await api.delete(`/events/${event._id}/unregister`, {
-                  headers: { Authorization: `Bearer ${token}` },
-                });
-                setRegistered((prev) =>
-                  prev.filter((e) => e._id !== event._id)
-                );
-              } catch (err) {
-                alert("Failed to unregister from event");
-              }
-            }
-          }}
-        >
-          Unregister
-        </button>
-      </div>
-      <div className="mb-2">
-        <div className="font-semibold text-sm mb-1">Comments & Ratings:</div>
-        <ul className="mb-2">
-          {comments && comments.length > 0 ? (
-            comments.map((c, idx) => (
-              <li key={idx} className="text-xs text-gray-700 mb-1">
-                <span className="font-bold">{c.user?.name || "User"}:</span> {c.comment}{" "}
-                <span className="text-yellow-500">{c.rating}★</span>
-              </li>
-            ))
-          ) : (
-            <li className="text-xs text-gray-400">No comments yet.</li>
-          )}
-        </ul>
-        <textarea
-          className="w-full border rounded p-1 text-xs mb-1"
-          rows={2}
-          placeholder="Add a comment..."
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-        />
-        <div className="flex items-center gap-2 mb-1">
-          <label className="text-xs">Rating:</label>
-          <select
-            className="border rounded text-xs"
-            value={rating}
-            onChange={(e) => setRating(Number(e.target.value))}
-          >
-            <option value={0}>Select</option>
-            {[1, 2, 3, 4, 5].map((n) => (
-              <option key={n} value={n}>
-                {n}★
-              </option>
-            ))}
-          </select>
-        </div>
-        <button
-          className="px-2 py-1 bg-orange-500 text-white rounded text-xs hover:bg-orange-600"
-          onClick={handleCommentSubmit}
-          disabled={submitting}
-        >
-          {submitting ? "Submitting..." : "Add Comment"}
-        </button>
+    <div className="relative bg-white/5 backdrop-blur-sm border border-orange-500/20 rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
+      {/* Gradient Header */}
+      <div className="h-2 bg-gradient-to-r from-orange-500 to-pink-500" />
+
+      <div className="p-6">
+        <h4 className="text-xl font-bold text-white mb-2 line-clamp-1">{event.title}</h4>
+        <p className="text-gray-300 text-sm mb-1">
+          📅 {new Date(event.date).toLocaleDateString()}
+        </p>
+        <p className="text-gray-300 text-sm mb-4">
+          📍 {event.venue}
+        </p>
+
+        {isOrganizer ? (
+          <div className="flex gap-3">
+            <button
+              onClick={() => navigate("/create-event", { state: { event } })}
+              className="flex-1 py-2 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition text-sm"
+            >
+              Edit
+            </button>
+            <button
+              onClick={handleDelete}
+              className="flex-1 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition text-sm"
+            >
+              Delete
+            </button>
+          </div>
+        ) : (
+          <div className="flex gap-3">
+            <button
+              onClick={handleUnregister}
+              className="flex-1 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition text-sm"
+            >
+              Unregister
+            </button>
+            <Link
+              to={`/events/${event._id}`}
+              className="flex-1 py-2 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition text-sm text-center"
+            >
+              View Details
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

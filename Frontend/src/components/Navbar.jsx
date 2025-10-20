@@ -1,120 +1,107 @@
-import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React from "react";
+// Removed Link and useLocation imports to resolve "not in Router context" error
+// import { Link, useLocation } from "react-router-dom";
+// Note: We use <a> tags and window.location.pathname for navigation instead of Link and useLocation.
 
 function Navbar() {
-  const location = useLocation();
-  const user = JSON.parse(localStorage.getItem("user"));
-  const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem("theme") === "dark";
-  });
+  // Use window.location.pathname to check the current path without React Router hooks
+  const currentPath =
+    typeof window !== "undefined" ? window.location.pathname : "";
 
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-      document.body.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      document.body.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [darkMode]);
+  // Using localStorage for mock user authentication status
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  // Helper to determine active link class
+  const getLinkClasses = (path) => {
+    // Check if the current path starts with the link's path (e.g., /events/123)
+    const isActive =
+      currentPath.startsWith(path) || (path === "/" && currentPath === "/");
+
+    // Base classes for navigation links
+    const baseClasses =
+      "text-[#1a2340] hover:text-[#c7a008] transition duration-150 font-medium";
+
+    return `${baseClasses} ${
+      isActive
+        ? "text-[#c7a008] font-semibold" // Active link color (Orange/Gold)
+        : "text-[#1a2340]" // Default link color (Dark Blue/Gray)
+    }`;
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    // Using window.location.href ensures a full state reset after logout
+    window.location.href = "/";
+  };
 
   return (
-    <nav className="bg-[#1a1a1a] text-white shadow-xl sticky top-0 z-50 border-b border-orange-500">
-      <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2">
-          <span className="bg-orange-500 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-lg shadow-md">
-            EV
-          </span>
-          <span className="text-2xl font-bold text-orange-400 tracking-wide">
-            EventsNow
-          </span>
-        </Link>
+    // Applied new header styling: light background, wide padding, shadow
+    <nav className="flex items-center justify-between px-6 sm:px-12 py-4 bg-[#ffffff] border-b border-[#d6d8de] shadow-sm sticky top-0 z-10">
+      {/* Logo and Name (Left side) - Switched Link to <a> */}
+      <a href="/" className="flex items-center space-x-2">
+        <div className="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-[#1a2340]">
+          {/* Placeholder Icon (as /vite.png is inaccessible) */}
+          <img
+            src="/vite.png" // replace with your logo path
+            alt="EventsNow Logo"
+            className="w-5 h-5"
+          />
+        </div>
+        <h1 className="text-xl font-bold">
+          <span className="text-[#1a2340]">Events</span>
+          <span className="text-[#c7a008]">Now</span>
+        </h1>
+      </a>
 
-        {/* Navigation */}
-        <div className="flex gap-4 md:gap-6 items-center">
-          {/* Theme Toggle */}
-          {/* <button
-            onClick={() => setDarkMode((v) => !v)}
-            className="p-2 rounded-full bg-[#2a2a2a] border border-gray-600 hover:bg-orange-600 transition"
-            title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-            aria-label="Toggle dark mode"
-          >
-            {darkMode ? (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5 text-yellow-300">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 3v1.5m0 15V21m8.485-8.485h-1.5m-15 0H3m15.364-6.364l-1.06 1.06M6.697 17.667l-1.06 1.06m12.727 0l-1.06-1.06M6.697 6.697l-1.06-1.06M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5 text-white">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21.752 15.002A9.718 9.718 0 0112 21.75c-5.385 0-9.75-4.365-9.75-9.75 0-4.136 2.64-7.64 6.348-9.165a.75.75 0 01.81 1.301A7.501 7.501 0 0012 19.5a7.48 7.48 0 006.114-3.09.75.75 0 01.976-.098.75.75 0 01.325.908z"/>
-              </svg>
-            )}
-          </button> */}
+      {/* Navigation/Action Buttons (Right side) */}
+      <div className="flex items-center space-x-4">
+        {/* Events Link */}
+        <a
+          href="/events"
+          className={getLinkClasses("/events") + " hidden sm:inline"}
+        >
+          Events
+        </a>
 
-          {/* Events */}
-          <Link
-            to="/events"
-            className={`font-medium transition hover:text-orange-400 ${
-              location.pathname.startsWith("/events")
-                ? "text-orange-400"
-                : "text-gray-300"
-            }`}
-          >
-            Events
-          </Link>
-
-          {/* Dashboard */}
-          {user && (
-            <Link
-              to="/dashboard"
-              className={`font-medium transition hover:text-orange-400 ${
-                location.pathname.startsWith("/dashboard")
-                  ? "text-orange-400"
-                  : "text-gray-300"
-              }`}
+        {/* Conditional Auth Links */}
+        {!user ? (
+          // Logged Out State: Log In and Sign Up buttons
+          <>
+            {/* Log In Link */}
+            <a
+              href="/login"
+              className={getLinkClasses("/login") + " hidden md:inline"}
+            >
+              Log In
+            </a>
+            {/* Sign Up Link (Primary CTA) */}
+            <a
+              href="/signup"
+              className="px-4 py-2 text-sm bg-[#c7a008] text-white font-semibold rounded-full hover:bg-[#a58607] transition-all"
+            >
+              Sign Up
+            </a>
+          </>
+        ) : (
+          // Logged In State: Dashboard and Logout button
+          <>
+            {/* Dashboard Link */}
+            <a
+              href="/dashboard"
+              className={getLinkClasses("/dashboard") + " hidden sm:inline"}
             >
               Dashboard
-            </Link>
-          )}
-
-          {/* Greeting */}
-          {user && (
-            <span className="text-gray-400 text-sm hidden md:inline">
-              Hi, <span className="text-white">{user.name.split(" ")[0]}</span>
-            </span>
-          )}
-
-          {/* Auth Buttons */}
-          {!user ? (
-            <>
-              <Link
-                to="/login"
-                className="px-4 py-1 rounded bg-orange-500 hover:bg-orange-600 text-white transition"
-              >
-                Login
-              </Link>
-              <Link
-                to="/signup"
-                className="px-4 py-1 rounded bg-green-500 hover:bg-green-600 text-white transition"
-              >
-                Sign Up
-              </Link>
-            </>
-          ) : (
+            </a>
+            {/* Logout Button */}
             <button
-              onClick={() => {
-                localStorage.removeItem("token");
-                localStorage.removeItem("user");
-                window.location.href = "/";
-              }}
-              className="px-4 py-1 rounded bg-gray-800 hover:bg-gray-600 text-white transition"
+              onClick={handleLogout}
+              className="px-4 py-2 text-sm bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-all"
             >
               Logout
             </button>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </nav>
   );

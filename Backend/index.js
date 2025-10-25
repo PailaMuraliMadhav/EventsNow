@@ -1,4 +1,3 @@
-// Debug: Print email credentials to verify .env loading
 
 import express from "express";
 import mongoose from "mongoose";

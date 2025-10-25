@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import api from "../api/axios";
 
-// Event Card (clean, light, navy-gold theme)
+// Event Card
 function EventCard({ event, onClick }) {
   return (
     <div
-      className="relative rounded-xl shadow-md border border-[#d6d8de] hover:shadow-lg transition cursor-pointer overflow-hidden bg-white"
+      className="relative rounded-xl shadow-md border border-[#d6d8de] hover:shadow-lg transition-transform hover:scale-[1.02] cursor-pointer overflow-hidden bg-white"
       onClick={onClick}
       tabIndex={0}
       aria-label={event.title}
@@ -41,7 +43,7 @@ function EventCard({ event, onClick }) {
   );
 }
 
-// Small-screen hook
+// Hook for small screens
 function useIsSmallScreen() {
   const [isSmall, setIsSmall] = useState(false);
   useEffect(() => {
@@ -60,6 +62,7 @@ function Events() {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState(null);
   const isSmallScreen = useIsSmallScreen();
+  const navigate = useNavigate();
 
   useEffect(() => {
     api.get("/events").then((res) => {
@@ -82,8 +85,44 @@ function Events() {
   const clubs = [...new Set(events.map((e) => e.club).filter(Boolean))];
   const categories = [...new Set(events.map((e) => e.category).filter(Boolean))];
 
+  // ✅ Beautiful SweetAlert2 handler
+  const handleRegister = (link) => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      Swal.fire({
+        title: "Please Sign In",
+        text: "You need to sign in before registering for an event.",
+        icon: "info",
+        showCancelButton: true,
+        confirmButtonText: "Go to Login",
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#1a2340",
+        cancelButtonColor: "#c7a008",
+        background: "#fff",
+        color: "#1a2340",
+        width: "320px",
+        backdrop: `
+          rgba(0,0,0,0.5)
+          left top
+          no-repeat
+        `,
+        customClass: {
+          popup: "rounded-xl shadow-lg p-4",
+          title: "text-lg font-semibold",
+        },
+      }).then((result) => {
+        if (result.isConfirmed) navigate("/login");
+      });
+      return;
+    }
+
+    // ✅ If logged in
+    window.open(link, "_blank");
+  };
+
   return (
-    <div className="min-h-screen bg-[#f2f3f5] p-4 sm:p-8 text-[#1a2340]">
+    <div className="min-h-screen bg-[#f2f3f5] p-4 sm:p-8 text-[#1a2340] transition-all">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-3xl sm:text-4xl font-extrabold mb-8 text-center text-[#1a2340]">
           <span className="text-[#c7a008]">Upcoming</span> Events
@@ -158,21 +197,31 @@ function Events() {
 
         {/* Modal */}
         {selected && (
-          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-3">
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-3 animate-fadeIn">
             <div
               className={`bg-white text-[#1a2340] rounded-2xl shadow-2xl w-full ${
                 isSmallScreen
-                  ? "max-w-[95vw] max-h-[90vh] p-4"
-                  : "max-w-lg max-h-[90vh] p-6"
-              } relative border border-[#c7a008]/30 overflow-y-auto`}
+                  ? "max-w-[90vw] max-h-[85vh] p-4"
+                  : "max-w-md max-h-[85vh] p-6"
+              } relative border border-[#c7a008]/30 overflow-y-auto transition-transform scale-100`}
             >
               <button
-                className="absolute top-2 right-3 text-gray-500 hover:text-[#c7a008] text-2xl"
-                onClick={() => setSelected(null)}
-                aria-label="Close"
-              >
-                &times;
-              </button>
+  onClick={() => setSelected(null)}
+  aria-label="Close"
+  className="absolute top-3 right-3 text-gray-700 bg-white/80 hover:bg-white rounded-full shadow-md hover:text-[#c7a008] transition-all duration-200 p-2"
+>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    strokeWidth={2}
+    stroke="currentColor"
+    className="w-5 h-5"
+  >
+    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+  </svg>
+</button>
+
 
               <img
                 src={
@@ -201,14 +250,13 @@ function Events() {
               </p>
 
               <div className="flex flex-col gap-2">
-                <a
-                  href={selected.registrationLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => handleRegister(selected.registrationLink)}
                   className="w-full text-center bg-[#1a2340] text-white py-2 rounded-lg font-semibold hover:bg-[#2b3560] transition text-sm"
                 >
                   Register
-                </a>
+                </button>
+
                 <a
                   href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
                     selected.title
